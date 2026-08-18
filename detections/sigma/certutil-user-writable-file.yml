@@ -1,0 +1,27 @@
+title: Certutil Creates File in User Writable Directory
+id: b12be448-42e2-46ba-a70e-b845a0afdb6e
+status: experimental
+description: Detects files created by certutil in common user-writable paths.
+references:
+  - https://attack.mitre.org/techniques/T1105/
+author: Bin Nguyen
+date: 2026-07-01
+logsource:
+  category: file_event
+  product: windows
+detection:
+  selection_image:
+    Image|endswith: '\certutil.exe'
+  selection_path:
+    TargetFilename|contains:
+      - '\Users\Public\'
+      - '\AppData\'
+      - '\Temp\'
+      - '\Downloads\'
+  condition: selection_image and selection_path
+falsepositives:
+  - Authorized software deployment or certificate maintenance
+level: high
+tags:
+  - attack.command-and-control
+  - attack.t1105
