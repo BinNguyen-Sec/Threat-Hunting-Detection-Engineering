@@ -17,7 +17,7 @@ This lab was built to answer one question:
 
 **Can a small SOC stack reconstruct an attack from independent telemetry instead of trusting isolated alerts?**
 
-The environment combines a Kali attacker, a monitored Windows 10 endpoint, and a Wazuh server. I used the attack chain to generate evidence, validated the telemetry pipeline, built behavioral hunts, correlated the events into an incident model, mapped the observed behavior to MITRE ATT&CK, and converted the findings into reusable Sigma detections.
+The environment combines a Kali attacker, a monitored Windows 10 endpoint, and a Wazuh server. I used the attack chain to generate evidence, validated the telemetry pipeline, built behavioral hunts, correlated events into an incident model, mapped observed behavior to MITRE ATT&CK, and converted findings into reusable Sigma detections.
 
 ### What was built
 
@@ -104,45 +104,22 @@ with `ProcessGuid`, `ParentProcessGuid`, `CommandLine`, `TargetFilename`, `Desti
 
 Hunts → [`hunts/`](hunts/)
 
-![Saved Wazuh hunts](evidence/04-saved-hunts.png)
-
 ---
 
-## 04 / EVIDENCE
+## 04 / EVIDENCE RECORDS
 
-### RDP password-guessing simulation
+The public repository keeps the strongest evidence as sanitized technical records instead of dumping every screenshot from the original university report. This keeps the case study readable and avoids publishing reusable lab credentials or unrelated desktop content.
 
-The original screenshot contained a lab credential, so the public copy is deliberately redacted.
+| Evidence | What it proves |
+|---|---|
+| [`rdp-authentication.md`](evidence/telemetry/rdp-authentication.md) | RDP password-guessing model, `4625 → 4624`, Logon Type 10 context |
+| [`certutil-transfer.md`](evidence/telemetry/certutil-transfer.md) | `certutil.exe` process creation, remote URL transfer, destination in `Users\Public` |
+| [`file-corroboration.md`](evidence/telemetry/file-corroboration.md) | Sysmon FileCreate + Wazuh FIM independently corroborate the same artifact |
+| [`powershell-callback.md`](evidence/telemetry/powershell-callback.md) | PowerShell `4104` exposes `TcpClient` callback logic and incident marker |
 
-![RDP password guessing](evidence/01-rdp-password-guessing-redacted.jpg)
+The original lab report also contained screenshot evidence for the Wazuh dashboard, saved hunts, HTTP delivery, Red Team validation, process/file events, FIM and PowerShell Script Block Logging. Those screenshots are intentionally treated as supporting artifacts rather than the primary source of truth; the investigation records above preserve the event fields and conclusions used in analysis.
 
-### HTTP delivery observed from the source
-
-![HTTP delivery](evidence/02-http-delivery.jpg)
-
-### Wazuh telemetry pipeline online
-
-![Wazuh telemetry](evidence/03-wazuh-telemetry.png)
-
-### `certutil.exe` process creation + file creation
-
-Security `4688` and Sysmon `11` show the LOLBin transfer behavior and destination path.
-
-![Certutil process and file evidence](evidence/05-certutil-process-file.png)
-
-### Independent FIM confirmation
-
-Wazuh FIM rule `554` independently confirms the file appearing on the endpoint.
-
-![Wazuh FIM](evidence/06-fim-file-added.png)
-
-### PowerShell Script Block Logging
-
-Event `4104` exposes the script content and the direct TCP callback logic.
-
-![PowerShell 4104](evidence/07-powershell-4104-callback.png)
-
-Evidence notes → [`evidence/README.md`](evidence/README.md)
+Evidence handling notes → [`evidence/README.md`](evidence/README.md)
 
 ---
 
@@ -192,7 +169,7 @@ Some events existed locally but were absent from `wazuh-alerts-*` because only r
 **3. Behavioral detections survive lab changes better than IOC detections.**  
 The attacker overlay IP changed after a rebuild. A rule hard-coded to one IP would have aged immediately; a rule based on `certutil + remote URL + user-writable path` remained useful.
 
-Known limitations and future work → [`docs/limitations-and-lessons.md`](docs/limitations-and-lessons.md)
+Known limitations and future work → [`docs/limitations.md`](docs/limitations.md)
 
 ---
 
@@ -207,7 +184,7 @@ Known limitations and future work → [`docs/limitations-and-lessons.md`](docs/l
 │   ├── investigation-timeline.md
 │   ├── mitre-mapping.md
 │   ├── incident-response.md
-│   └── limitations-and-lessons.md
+│   └── limitations.md
 ├── hunts/
 │   ├── rdp-authentication.md
 │   ├── process-execution.md
@@ -220,12 +197,13 @@ Known limitations and future work → [`docs/limitations-and-lessons.md`](docs/l
 │   │   ├── powershell-direct-tcp-client.yml
 │   │   └── certutil-user-writable-file.yml
 │   └── rdp-correlation.md
-├── configs/wazuh/
+├── configs/
 └── evidence/
+    └── telemetry/
 ```
 
 ---
 
 ### Safety / scope
 
-All offensive actions shown here were performed against lab systems under my control for defensive validation. Public screenshots and configuration files are sanitized; real API keys and reusable credentials are intentionally excluded.
+All offensive actions represented here were performed against controlled lab systems for defensive validation. Public records and configuration files are sanitized; real API keys and reusable credentials are intentionally excluded.
