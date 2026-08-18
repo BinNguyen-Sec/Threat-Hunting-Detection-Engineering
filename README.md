@@ -19,8 +19,6 @@ This lab was built to answer one question:
 
 The environment combines a Kali attacker, a monitored Windows 10 endpoint, and a Wazuh server. I used the attack chain to generate evidence, validated the telemetry pipeline, built behavioral hunts, correlated events into an incident model, mapped observed behavior to MITRE ATT&CK, and converted findings into reusable Sigma detections.
 
-### What was built
-
 | Layer | Result |
 |---|---|
 | Infrastructure | 3-system lab connected over a private Tailscale overlay |
@@ -53,6 +51,8 @@ Core telemetry:
 - **Sysmon:** `1`, `3`, `11`, `13`
 - **PowerShell Operational:** `4104 / ScriptBlockText`
 - **Wazuh FIM:** file path, hash, size, add/modify/delete events
+
+![Telemetry pipeline](evidence/02-telemetry-pipeline.svg)
 
 Deep dive → [`docs/architecture.md`](docs/architecture.md)
 
@@ -100,24 +100,39 @@ The correlation pivots are:
 
 `identity → process → file → network → time`
 
-with `ProcessGuid`, `ParentProcessGuid`, `CommandLine`, `TargetFilename`, `DestinationIp`, `DestinationPort`, `LogonType`, and the attack window used to connect evidence.
+![Saved hunts](evidence/03-saved-hunts.svg)
 
 Hunts → [`hunts/`](hunts/)
 
 ---
 
-## 04 / EVIDENCE RECORDS
+## 04 / EVIDENCE GALLERY
 
-The public repository keeps the strongest evidence as sanitized technical records instead of dumping every screenshot from the original university report. This keeps the case study readable and avoids publishing reusable lab credentials or unrelated desktop content.
+The strongest public evidence is presented as sanitized visual records so the case study stays readable and does not expose reusable lab credentials or unrelated desktop content.
 
-| Evidence | What it proves |
-|---|---|
-| [`rdp-authentication.md`](evidence/telemetry/rdp-authentication.md) | RDP password-guessing model, `4625 → 4624`, Logon Type 10 context |
-| [`certutil-transfer.md`](evidence/telemetry/certutil-transfer.md) | `certutil.exe` process creation, remote URL transfer, destination in `Users\Public` |
-| [`file-corroboration.md`](evidence/telemetry/file-corroboration.md) | Sysmon FileCreate + Wazuh FIM independently corroborate the same artifact |
-| [`powershell-callback.md`](evidence/telemetry/powershell-callback.md) | PowerShell `4104` exposes `TcpClient` callback logic and incident marker |
+### RDP authentication pattern
 
-The original lab report also contained screenshot evidence for the Wazuh dashboard, saved hunts, HTTP delivery, Red Team validation, process/file events, FIM and PowerShell Script Block Logging. Those screenshots are intentionally treated as supporting artifacts rather than the primary source of truth; the investigation records above preserve the event fields and conclusions used in analysis.
+![RDP authentication](evidence/01-rdp-authentication.svg)
+
+Detailed record → [`evidence/telemetry/rdp-authentication.md`](evidence/telemetry/rdp-authentication.md)
+
+### `certutil.exe` remote transfer
+
+![Certutil transfer](evidence/04-certutil-transfer.svg)
+
+Detailed record → [`evidence/telemetry/certutil-transfer.md`](evidence/telemetry/certutil-transfer.md)
+
+### Sysmon + Wazuh FIM corroboration
+
+![FIM corroboration](evidence/05-fim-corroboration.svg)
+
+Detailed record → [`evidence/telemetry/file-corroboration.md`](evidence/telemetry/file-corroboration.md)
+
+### PowerShell 4104 callback logic
+
+![PowerShell callback](evidence/06-powershell-callback.svg)
+
+Detailed record → [`evidence/telemetry/powershell-callback.md`](evidence/telemetry/powershell-callback.md)
 
 Evidence handling notes → [`evidence/README.md`](evidence/README.md)
 
@@ -141,8 +156,6 @@ Correlation design → [`detections/rdp-correlation.md`](detections/rdp-correlat
 
 ## 06 / TRIAGE
 
-Final lab verdict:
-
 | Field | Assessment |
 |---|---|
 | Verdict | **True Positive — Authorized Simulation** |
@@ -157,8 +170,6 @@ Response & hardening → [`docs/incident-response.md`](docs/incident-response.md
 ---
 
 ## 07 / WHAT I LEARNED
-
-Three lessons mattered more than the tools:
 
 **1. An alert is not an incident.**  
 `4688`, `4104`, or a FIM alert alone is weak compared with identity + process + file + network context.
@@ -179,26 +190,16 @@ Known limitations and future work → [`docs/limitations.md`](docs/limitations.m
 .
 ├── README.md
 ├── docs/
-│   ├── architecture.md
-│   ├── attack-scenario.md
-│   ├── investigation-timeline.md
-│   ├── mitre-mapping.md
-│   ├── incident-response.md
-│   └── limitations.md
 ├── hunts/
-│   ├── rdp-authentication.md
-│   ├── process-execution.md
-│   ├── file-activity.md
-│   ├── network-connections.md
-│   └── attack-correlation.md
 ├── detections/
-│   ├── sigma/
-│   │   ├── certutil-remote-download.yml
-│   │   ├── powershell-direct-tcp-client.yml
-│   │   └── certutil-user-writable-file.yml
-│   └── rdp-correlation.md
 ├── configs/
 └── evidence/
+    ├── 01-rdp-authentication.svg
+    ├── 02-telemetry-pipeline.svg
+    ├── 03-saved-hunts.svg
+    ├── 04-certutil-transfer.svg
+    ├── 05-fim-corroboration.svg
+    ├── 06-powershell-callback.svg
     └── telemetry/
 ```
 
