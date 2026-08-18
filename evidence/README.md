@@ -1,19 +1,20 @@
 # Evidence Index
 
-This directory is reserved for a **curated subset** of lab screenshots rather than a dump of the original report.
+This directory contains a **curated, sanitized evidence set** reconstructed from the completed lab report. The goal is to preserve investigation value without turning the repository into a dump of report screenshots.
 
-Planned evidence groups:
+## Public evidence records
 
-- `architecture/` — lab topology and telemetry path
-- `red-team/` — authorized RDP / HTTP / controlled callback proof
-- `telemetry/` — Wazuh agent, Security/Sysmon/FIM/PowerShell proof
-- `hunting/` — Saved Hunts, certutil correlation and investigation views
-- `detection/` — Sigma / response evidence where useful
+- [`telemetry/rdp-authentication.md`](telemetry/rdp-authentication.md) — repeated RDP failures followed by valid RDP access and the fields needed for correlation.
+- [`telemetry/certutil-transfer.md`](telemetry/certutil-transfer.md) — process creation and command-line evidence for `certutil.exe` transferring an artifact into `C:\Users\Public`.
+- [`telemetry/file-corroboration.md`](telemetry/file-corroboration.md) — Sysmon FileCreate plus Wazuh FIM corroboration for the same artifact.
+- [`telemetry/powershell-callback.md`](telemetry/powershell-callback.md) — PowerShell Event `4104`, `ScriptBlockText`, direct TCP client behavior and the safe incident marker.
+
+The original report also preserves screenshots for the Wazuh dashboard, saved hunts, HTTP delivery, Red Team validation, process/file telemetry, FIM and PowerShell Script Block Logging. Screenshots that expose lab credentials or unrelated desktop information are not published unredacted.
 
 ## Integrity rule
 
-Attack-emulation screenshots and later telemetry-validation screenshots may originate from separate controlled runs due a snapshot rollback. Their timestamps must not be presented as a single continuous attack window.
+Attack-emulation evidence and later telemetry-validation evidence may originate from separate controlled runs because the environment was restored from snapshot during the project. Their timestamps are therefore **not** presented as one continuous attack window.
 
 ## Redaction rule
 
-Before publication, screenshots should be cropped/redacted where needed to avoid exposing unrelated desktop content, secrets or personal identifiers. Real API keys and credentials are never included.
+Public evidence must not contain reusable passwords, API keys or unrelated personal data. IOC values that are necessary to explain the controlled lab may remain when they do not create a reusable secret.
