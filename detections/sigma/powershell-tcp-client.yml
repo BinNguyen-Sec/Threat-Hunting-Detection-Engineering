@@ -1,0 +1,28 @@
+title: PowerShell Script Creates Direct TCP Client
+id: 6e51ed8b-bb80-4f16-9aa8-a34ea32c4c2b
+status: experimental
+description: Detects PowerShell script blocks that instantiate a direct TCP client.
+references:
+  - https://attack.mitre.org/techniques/T1059/001/
+  - https://attack.mitre.org/techniques/T1095/
+author: Bin Nguyen
+date: 2026-07-01
+logsource:
+  product: windows
+  service: powershell
+detection:
+  selection:
+    EventID: 4104
+    ScriptBlockText|contains:
+      - 'System.Net.Sockets.TcpClient'
+      - 'New-Object System.Net.Sockets.TcpClient'
+      - '.Connect('
+  condition: selection
+falsepositives:
+  - Authorized network diagnostics or administration scripts
+level: high
+tags:
+  - attack.execution
+  - attack.t1059.001
+  - attack.command-and-control
+  - attack.t1095
