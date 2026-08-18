@@ -1,0 +1,5 @@
+<!-- Lab example: realtime monitoring of a user-writable directory. -->
+<syscheck>
+  <disabled>no</disabled>
+  <directories check_all="yes" realtime="yes">C:\Users\Public</directories>
+</syscheck>
